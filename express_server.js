@@ -30,17 +30,14 @@ app.post('/addNewTrade', function (req, res) {
 });
 
 app.post('/updateTrade/:tradeId', function (req, res) {
-  console.log('in update Trade');
   let tradeId = parseInt(req.params.tradeId);
   let editTrade = req.body.editTrade;
-  console.log(tradeId, editTrade);
   trades.updateTrade(tradeId, editTrade, function(err, result) {
     (err == 'error') ? res.send({status: 0, message: 'Database Error!!'})
                      : res.send({status: 1, message: "Data Updated Successfully!", data: editTrade});    });
 });
 
 app.post('/deleteTrade/:tradeId', function (req, res) {
-  console.log('delete trade service');
   let tradeId = parseInt(req.params.tradeId);
   trades.deleteTrade(tradeId, function(err, result) {
     (err == 'error') ? res.send( {status:0, message:'Database Error!!'} )

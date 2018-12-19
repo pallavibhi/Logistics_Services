@@ -54,12 +54,9 @@ module.exports = {
       if (err) {
         console.log('Unable to connect to Mongo.');
       } else {
-        console.log(tradeId + ' *******************');
         let query = { trade_id: tradeId };
-        console.log(query);
         const collection = db.get().collection('trades');
         collection.deleteOne( query, function(err, res) {
-          console.log(res.result.n + " document(s) deleted");
           if(err) { callback('error', err); }
           callback('success', res);
         });
