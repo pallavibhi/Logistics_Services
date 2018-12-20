@@ -15,34 +15,46 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 app.get('/fetchTrades', function (req, res) {
-  trades.fetchAllTrades(function(err, result) {
-    (err === 'error') ? res.send('Unsuccessful')
-                      : res.send(result);
-    });
+  trades.fetchAllTrades().
+        then(response => {
+           res.send(response)
+        }).catch(error => {
+            res.send(error);
+        });
 });
 
 app.post('/addNewTrade', function (req, res) {
   let newTrade = req.body.newTrade;
-  trades.addNewTrade(newTrade, function(err, result) {
-    (err == 'error') ? res.send({status: 0, message: 'Database Error!!'})
-                     : res.send({status: 1, message: "Data Added Successfully!", data: newTrade});
-    });
+  trades.addNewTrade(newTrade)
+        .then(response => {
+            res.send({status: 1, message: "Data Added Successfully!", data: newTrade});
+        })
+        .catch(error => {
+            res.send({status: 0, message: 'Database Error!!'});
+        });
 });
 
 app.post('/updateTrade/:tradeId', function (req, res) {
   let tradeId = parseInt(req.params.tradeId);
   let editTrade = req.body.editTrade;
-  trades.updateTrade(tradeId, editTrade, function(err, result) {
-    (err == 'error') ? res.send({status: 0, message: 'Database Error!!'})
-                     : res.send({status: 1, message: "Data Updated Successfully!", data: editTrade});    });
+  trades.updateTrade(tradeId, editTrade)
+        .then(response => {
+            res.send({status: 1, message: "Data Updated Successfully!", data: editTrade});
+        })
+        .catch(error => {
+            res.send({status: 0, message: 'Database Error!!'})
+        });
 });
 
 app.post('/deleteTrade/:tradeId', function (req, res) {
   let tradeId = parseInt(req.params.tradeId);
-  trades.deleteTrade(tradeId, function(err, result) {
-    (err == 'error') ? res.send( {status:0, message:'Database Error!!'} )
-                     : res.send( {status: 1, message: "Data Deleted Successfully!", data: tradeId});
-    });
+  trades.deleteTrade(tradeId)
+        .then(response => {
+            res.send( {status: 1, message: "Data Deleted Successfully!", data: tradeId});
+        })
+        .catch(error => {
+            res.send( {status:0, message:'Database Error!!'} )
+        });
 });
 
 const server = http.createServer(app);
