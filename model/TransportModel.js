@@ -3,13 +3,13 @@ var db = require('./db');
 const URL = 'mongodb://root:root_123@ds157964.mlab.com:57964/poc_logistics_db';
 
 module.exports = {
-  fetchAllTrades: function () {
+  fetchAllTransports: function () {
     return new Promise((resolve, reject) => {
         db.connect(URL, function(err) {
             if (err) {
               console.log('Unable to connect to Mongo.')
             } else {
-              const collection = db.get().collection('trades');
+              const collection = db.get().collection('transports');
               collection.find({}).toArray()
               .then(response =>  {
                   resolve(response);
@@ -20,14 +20,14 @@ module.exports = {
     });
   },
 
-  addNewTrade: function(newTrade) {
+  addNewTransport: function(newTransport) {
     return new Promise((resolve, reject) => {
       db.connect(URL, function(err) {
         if (err) {
           console.log('Unable to connect to Mongo.');
         } else {
-          const collection = db.get().collection('trades');
-          collection.insertOne( newTrade, function(err, res) {
+          const collection = db.get().collection('transports');
+          collection.insertOne( newTransport, function(err, res) {
             err ? reject(err) :
             resolve(res);
           })
@@ -36,16 +36,17 @@ module.exports = {
   });
   },
 
-  updateTrade: function(editTradeId, editTrade) {
+  updateTransport: function(transportId, editTransport) {
     return new Promise((resolve, reject) => {
+      console.log(transportId, editTransport);
       db.connect(URL, function(err) {
         if (err) {
           console.log('Unable to connect to Mongo.');
         } else {
-          let query = { trade_id: editTradeId };
-          let newTradeValue = { $set: editTrade}
-          const collection = db.get().collection('trades');
-          collection.updateOne( query, newTradeValue, function(err, res) {
+          let query = { transport_id: transportId };
+          let newTransportValue = { $set: editTransport}
+          const collection = db.get().collection('transports');
+          collection.updateOne( query, newTransportValue, function(err, res) {
             err ? reject(err) :
             resolve(res);
           });
@@ -54,20 +55,39 @@ module.exports = {
     });
   },
 
-  deleteTrade: function(deleteTradeId) {
+  deleteTransport: function(transportId) {
     return new Promise((resolve, reject) => {
       db.connect(URL, function(err) {
         if (err) {
           console.log('Unable to connect to Mongo.');
         } else {
-          let query = { trade_id: deleteTradeId };
-          const collection = db.get().collection('trades');
+          let query = { transport_id: transportId };
+          const collection = db.get().collection('transports');
           collection.deleteOne( query, function(err, res) {
             if(err) { reject(err); }
             resolve(res);
           });
         }
       });
+    });
+  },
+
+  
+  getTradesToTransports: function(tradeIds) {
+    return new Promise((resolve, reject) => {
+      console.log('*********',tradeIds);
+        db.connect(URL, function(err) {
+            if (err) {
+            console.log('Unable to connect to Mongo.')
+            } else {
+            const collection = db.get().collection('trades');
+            collection.find({trade_id: {$in: tradeIds}}).toArray()
+            .then(response =>  {
+                resolve(response);
+            })
+            .catch(error => {reject(error)});
+            }
+        });
     });
   }
 }
